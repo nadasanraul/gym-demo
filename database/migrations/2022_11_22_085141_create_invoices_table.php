@@ -16,9 +16,9 @@ return new class extends Migration
         Schema::create('invoices', function (Blueprint $table) {
             $table->id();
             $table->foreignId('user_id');
-            $table->enum('status', ['Outstanding', 'Paid', 'Void']);
+            $table->string('status');
             $table->string('description');
-            $table->bigInteger('amount');
+            $table->bigInteger('amount')->default(0);
             $table->timestamp('date');
             $table->timestamps();
 

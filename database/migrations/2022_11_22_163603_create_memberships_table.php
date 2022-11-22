@@ -16,8 +16,8 @@ return new class extends Migration
         Schema::create('memberships', function (Blueprint $table) {
             $table->id();
             $table->foreignId('user_id');
-            $table->enum('status', ['Active', 'Cancelled']);
-            $table->bigInteger('credit_amount');
+            $table->string('status');
+            $table->bigInteger('credits');
             $table->timestamp('start_date')->nullable();
             $table->timestamp('end_date')->nullable();
             $table->timestamps();
