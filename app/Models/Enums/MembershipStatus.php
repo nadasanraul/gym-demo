@@ -2,8 +2,8 @@
 
 namespace App\Models\Enums;
 
-enum MembershipStatus
+enum MembershipStatus: string
 {
-    case Active;
-    case Cancelled;
+    case Active = 'Active';
+    case Cancelled = 'Cancelled';
 }

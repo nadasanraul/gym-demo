@@ -1,9 +1,9 @@
 <?php
 namespace App\Models\Enums;
 
-enum InvoiceStatus
+enum InvoiceStatus: string
 {
-    case Outstanding;
-    case Paid;
-    case Void;
+    case Outstanding = 'Outstanding';
+    case Paid = 'Paid';
+    case Void = 'Void';
 }
