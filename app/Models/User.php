@@ -4,6 +4,7 @@ namespace App\Models;
 
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Relations\HasMany;
+use Illuminate\Database\Eloquent\Relations\HasOne;
 
 class User extends Model
 {
@@ -37,5 +38,15 @@ class User extends Model
     public function invoices(): HasMany
     {
         return $this->hasMany(Invoice::class);
+    }
+
+    /**
+     * Defines the relation with Membership
+     *
+     * @return HasOne
+     */
+    public function membership(): HasOne
+    {
+        return $this->hasOne(Membership::class);
     }
 }
