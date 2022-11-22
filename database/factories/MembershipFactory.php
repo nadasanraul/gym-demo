@@ -18,7 +18,7 @@ class MembershipFactory extends Factory
         return [
             'user_id' => User::query()->first()->id,
             'status' => MembershipStatus::Active,
-            'credit_amount' => 10,
+            'credits' => 10,
             'start_date' => now(),
             'end_date' => now()->addMonth(),
         ];
