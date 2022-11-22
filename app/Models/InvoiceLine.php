@@ -9,6 +9,16 @@ class InvoiceLine extends Model
 {
     use HasFactory;
 
+    /**
+     * Attributes that are mass assignable
+     *
+     * @var string[]
+     */
+    protected $fillable = [
+        'description',
+        'amount',
+    ];
+
     public function invoice(): BelongsTo
     {
         return $this->belongsTo(Invoice::class);

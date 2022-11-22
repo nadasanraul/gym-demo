@@ -3,6 +3,7 @@
 namespace App\Models;
 
 use App\Models\Enums\MembershipStatus;
+use Illuminate\Database\Eloquent\Casts\Attribute;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 
@@ -17,6 +18,8 @@ class Membership extends Model
      */
     protected $casts = [
         'status' => MembershipStatus::class,
+        'start_date' => 'datetime',
+        'end_date' => 'datetime',
     ];
 
     /**
@@ -29,6 +32,15 @@ class Membership extends Model
     ];
 
     /**
+     * Attributes that are mass assignable
+     *
+     * @var string[]
+     */
+    protected $fillable = [
+        'credits',
+    ];
+
+    /**
      * Defines the relation with User
      *
      * @return BelongsTo
@@ -36,5 +48,25 @@ class Membership extends Model
     public function user(): BelongsTo
     {
         return $this->belongsTo(User::class);
+    }
+
+    public function isActive(): bool
+    {
+        return $this->status === MembershipStatus::Active;
+    }
+
+    public function isNotStarted(): bool
+    {
+        return $this->start_date->isFuture();
+    }
+
+    public function isExpired(): bool
+    {
+        return $this->end_date->isPast();
+    }
+
+    public function isEmpty(): bool
+    {
+        return $this->credits <= 0;
     }
 }

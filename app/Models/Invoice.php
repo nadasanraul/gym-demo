@@ -21,6 +21,17 @@ class Invoice extends Model
     ];
 
     /**
+     * Attributes that are mass assignable
+     *
+     * @var string[]
+     */
+    protected $fillable = [
+        'status',
+        'description',
+        'amount',
+    ];
+
+    /**
      * Attributes that should be hidden for serialization
      *
      * @var string[]
