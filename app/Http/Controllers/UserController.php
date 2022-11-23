@@ -67,7 +67,7 @@ class UserController extends Controller
 
             return response()->noContent();
         } catch (Throwable $e) {
-            return $this->errorResponse(statusCode: 400, throwable: $e, debug: true);
+            return $this->errorResponse(statusCode: 400, throwable: $e);
         }
     }
 }

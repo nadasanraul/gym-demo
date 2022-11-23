@@ -17,6 +17,7 @@ class InvoiceLine extends Model
     protected $fillable = [
         'description',
         'amount',
+        'invoice_id',
     ];
 
     public function invoice(): BelongsTo

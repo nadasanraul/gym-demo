@@ -29,6 +29,7 @@ class Invoice extends Model
         'status',
         'description',
         'amount',
+        'user_id',
     ];
 
     /**
