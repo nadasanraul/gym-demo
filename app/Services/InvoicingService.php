@@ -1,0 +1,123 @@
+<?php
+
+namespace App\Services;
+
+use App\Models\Enums\InvoiceStatus;
+use App\Models\Invoice;
+use App\Models\InvoiceLine;
+use App\Models\User;
+use Exception;
+use Illuminate\Support\Collection;
+
+class InvoicingService
+{
+    /**
+     * Retrieving all the invoices from the database with the lines and the user
+     *
+     * @return Collection
+     */
+    public function getInvoices(): Collection
+    {
+        $invoices = Invoice::with(['lines', 'user'])->get();
+
+        return $invoices;
+    }
+
+    /**
+     * Retrieving a sing invoice from the database
+     *
+     * @param int $id
+     */
+    public function getInvoice(int $id)
+    {
+        $invoice = Invoice::with(['lines', 'user'])->findOrFail($id);
+
+        return $invoice;
+    }
+
+    /**
+     * Storing the invoice in the database
+     *
+     * @param array $attributes
+     * @return Invoice
+     */
+    public function createInvoice(array $attributes): Invoice
+    {
+        $attributes['status'] = InvoiceStatus::Outstanding;
+
+        $invoice = Invoice::create($attributes);
+        $invoice->refresh();
+
+        return $invoice;
+    }
+
+    /**
+     * Updating an invoice based on the ID
+     * Properties are refreshed before returning in order to be the most up to date
+     *
+     * @param int $id
+     * @param array $attributes
+     * @return Invoice
+     */
+    public function updateInvoice(int $id, array $attributes): Invoice
+    {
+        $invoice = Invoice::findOrFail($id);
+
+        $invoice->update($attributes);
+        $invoice->refresh();
+
+        return $invoice;
+    }
+
+    /**
+     * Removing an invoice from the database
+     *
+     * @param int $id
+     * @return void
+     * @throws Exception
+     */
+    public function deleteInvoice(int $id): void
+    {
+        $invoice = Invoice::findOrFail($id);
+
+        if ($invoice->lines->isNotEmpty()) {
+            throw new Exception('Only empty invoices are allowed to be deleted');
+        }
+
+        $invoice->delete();
+    }
+
+    /**
+     * Storing an invoice line for an invoice in the database and updating the invoice amount
+     *
+     * @param int $invoiceId
+     * @param array $attributes
+     * @return InvoiceLine
+     */
+    public function createInvoiceLine(int $invoiceId, array $attributes): InvoiceLine
+    {
+        $attributes['invoice_id'] = $invoiceId;
+
+        $line = InvoiceLine::create($attributes);
+        // The incrementAmount call, is mapped to the scopeIncrementAmount in the Invoice model
+        Invoice::where('id', $invoiceId)->incrementAmount($line->amount);
+
+        return $line;
+    }
+
+    public function getCurrentInvoiceForUser(User $user)
+    {
+        return $user->invoices()
+            ->whereYear('date', now()->year)
+            ->whereMonth('date', now()->month)
+            ->firstOrCreate(
+                [
+                    'status' => InvoiceStatus::Outstanding,
+                ],
+                [
+                    'description' => "Invoice for {$user->name}.}",
+                    'date' => now(),
+                ]
+            );
+    }
+}

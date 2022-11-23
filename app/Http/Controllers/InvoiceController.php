@@ -2,9 +2,7 @@
 
 namespace App\Http\Controllers;
 
-use App\Models\Enums\InvoiceStatus;
-use App\Models\Invoice;
-use Exception;
+use App\Services\InvoicingService;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 use Illuminate\Http\Response;
@@ -13,6 +11,10 @@ use Throwable;
 
 class InvoiceController extends Controller
 {
+    public function __construct(private InvoicingService $invoicingService)
+    {
+    }
+
     /**
      * Endpoint to get all invoices
      *
@@ -21,8 +23,10 @@ class InvoiceController extends Controller
     public function index(): JsonResponse
     {
         try {
+            $invoices = $this->invoicingService->getInvoices();
+
             return response()->json([
-                ...Invoice::query()->with(['lines', 'user'])->get(),
+                ...$invoices,
             ]);
         } catch (Throwable $e) {
             return $this->errorResponse(statusCode: 400, throwable: $e);
@@ -32,13 +36,13 @@ class InvoiceController extends Controller
     /**
      * Endpoint to get a single invoice based on its ID
      *
-     * @param Invoice $invoice
+     * @param int $id
      * @return JsonResponse
      */
-    public function show(Invoice $invoice): JsonResponse
+    public function show(int $id): JsonResponse
     {
         try {
-            $invoice->load(['lines', 'user']);
+            $invoice = $this->invoicingService->getInvoice($id);
 
             return response()->json([
                 $invoice,
@@ -48,6 +52,12 @@ class InvoiceController extends Controller
         }
     }
 
+    /**
+     * Endpoint to store an invoice
+     *
+     * @param Request $request
+     * @return JsonResponse
+     */
     public function store(Request $request): JsonResponse
     {
         try {
@@ -60,15 +70,8 @@ class InvoiceController extends Controller
             ]);
 
             $data = $validator->validated();
-            $data = array_merge(
-                $data,
-                [
-                    'status' => InvoiceStatus::Outstanding,
-                ],
-            );
 
-            $invoice = Invoice::query()->create($data);
-            $invoice->refresh();
+            $invoice = $this->invoicingService->createInvoice($data);
 
             return response()->json($invoice);
         } catch (Throwable $e) {
@@ -76,7 +79,14 @@ class InvoiceController extends Controller
         }
     }
 
-    public function update(Invoice $invoice, Request $request): JsonResponse
+    /**
+     * Endpoint to update an invoice based on the id
+     *
+     * @param int $id
+     * @param Request $request
+     * @return JsonResponse
+     */
+    public function update(int $id, Request $request): JsonResponse
     {
         try {
             $validator = Validator::make($request->all(), [
@@ -88,8 +98,7 @@ class InvoiceController extends Controller
 
             $data = $validator->validated();
 
-            Invoice::query()->update($data);
-            $invoice->refresh();
+            $invoice = $this->invoicingService->updateInvoice($id, $data);
 
             return response()->json($invoice);
         } catch (Throwable $e) {
@@ -97,13 +106,16 @@ class InvoiceController extends Controller
         }
     }
 
-    public function destroy(Invoice $invoice): JsonResponse|Response
+    /**
+     * Endpoint to delete an invoice based on the id
+     *
+     * @param int $id
+     * @return JsonResponse|Response
+     */
+    public function destroy(int $id): JsonResponse|Response
     {
         try {
-            if ($invoice->lines->isNotEmpty()) {
-                throw new Exception('Only empty invoices are allowed to be deleted');
-            }
-            $invoice->delete();
+            $this->invoicingService->deleteInvoice($id);
 
             return response()->noContent();
         } catch (Throwable $e) {

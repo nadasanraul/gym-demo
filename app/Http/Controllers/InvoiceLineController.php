@@ -2,7 +2,7 @@
 
 namespace App\Http\Controllers;
 
-use App\Models\Invoice;
+use App\Services\InvoicingService;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Validator;
@@ -10,7 +10,7 @@ use Throwable;
 
 class InvoiceLineController extends Controller
 {
-    public function store(Invoice $invoice, Request $request): JsonResponse
+    public function store(int $invoiceId, Request $request, InvoicingService $invoicingService): JsonResponse
     {
         try {
             $validator = Validator::make($request->all(), [
@@ -20,10 +20,7 @@ class InvoiceLineController extends Controller
 
             $validated = $validator->validated();
 
-            $line = $invoice->lines()->create($validated);
-            $invoice->update([
-                'amount' => $invoice->amount + $line->amount,
-            ]);
+            $line = $invoicingService->createInvoiceLine($invoiceId, $validated);
 
             return response()->json($line);
         } catch (Throwable $e) {
