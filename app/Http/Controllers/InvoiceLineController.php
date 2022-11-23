@@ -2,20 +2,23 @@
 
 namespace App\Http\Controllers;
 
-use App\Http\Requests\StoreInvoiceLineRequest;
 use App\Models\Invoice;
 use Illuminate\Http\JsonResponse;
+use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Validator;
 use Throwable;
 
 class InvoiceLineController extends Controller
 {
-    public function store(StoreInvoiceLineRequest $request): JsonResponse
+    public function store(Invoice $invoice, Request $request): JsonResponse
     {
         try {
-            $validated = $request->validated();
+            $validator = Validator::make($request->all(), [
+                'amount' => 'required|integer|min:0',
+                'description' => 'required|string|max:255',
+            ]);
 
-            /** @var Invoice $invoice */
-            $invoice = Invoice::query()->find($validated['invoice_id']);
+            $validated = $validator->validated();
 
             $line = $invoice->lines()->create($validated);
             $invoice->update([

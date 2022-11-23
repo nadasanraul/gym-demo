@@ -2,12 +2,13 @@
 
 namespace App\Http\Controllers;
 
-use App\Http\Requests\StoreInvoiceRequest;
-use App\Http\Requests\UpdateInvoiceRequest;
 use App\Models\Enums\InvoiceStatus;
 use App\Models\Invoice;
+use Exception;
 use Illuminate\Http\JsonResponse;
+use Illuminate\Http\Request;
 use Illuminate\Http\Response;
+use Illuminate\Support\Facades\Validator;
 use Throwable;
 
 class InvoiceController extends Controller
@@ -47,10 +48,18 @@ class InvoiceController extends Controller
         }
     }
 
-    public function store(StoreInvoiceRequest $request): JsonResponse
+    public function store(Request $request): JsonResponse
     {
         try {
-            $data = $request->validated();
+            $validator = Validator::make($request->all(), [
+                'description' => 'required|string|max:255',
+                'user_id' => 'required|integer|exists:users,id',
+                'amount' => 'prohibited',
+                'status' => 'prohibited',
+                'date' => 'prohibited',
+            ]);
+
+            $data = $validator->validated();
             $data = array_merge(
                 $data,
                 [
@@ -59,6 +68,7 @@ class InvoiceController extends Controller
             );
 
             $invoice = Invoice::query()->create($data);
+            $invoice->refresh();
 
             return response()->json($invoice);
         } catch (Throwable $e) {
@@ -66,12 +76,20 @@ class InvoiceController extends Controller
         }
     }
 
-    public function update(Invoice $invoice, UpdateInvoiceRequest $request): JsonResponse
+    public function update(Invoice $invoice, Request $request): JsonResponse
     {
         try {
-            $data = $request->validated();
+            $validator = Validator::make($request->all(), [
+                'description' => 'sometimes|string|max:255',
+                'status' => 'sometimes|in:Outstanding,Paid,Void',
+                'amount' => 'prohibited',
+                'date' => 'prohibited',
+            ]);
+
+            $data = $validator->validated();
 
             Invoice::query()->update($data);
+            $invoice->refresh();
 
             return response()->json($invoice);
         } catch (Throwable $e) {
@@ -82,6 +100,9 @@ class InvoiceController extends Controller
     public function destroy(Invoice $invoice): JsonResponse|Response
     {
         try {
+            if ($invoice->lines->isNotEmpty()) {
+                throw new Exception('Only empty invoices are allowed to be deleted');
+            }
             $invoice->delete();
 
             return response()->noContent();
