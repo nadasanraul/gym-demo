@@ -43,7 +43,13 @@ class InvoicingService
      */
     public function createInvoice(array $attributes): Invoice
     {
-        $attributes['status'] = InvoiceStatus::Outstanding;
+        if (isset($attributes['amount']) && $attributes['amount'] < 0) {
+            throw new Exception('Invoice amount must be positive');
+        }
+
+        if (!isset($attributes['status'])) {
+            $attributes['status'] = InvoiceStatus::Outstanding;
+        }
 
         $invoice = Invoice::create($attributes);
         $invoice->refresh();
@@ -61,6 +67,10 @@ class InvoicingService
      */
     public function updateInvoice(int $id, array $attributes): Invoice
     {
+        if (isset($attributes['amount']) && $attributes['amount'] < 0) {
+            throw new Exception('Invoice amount must be positive');
+        }
+
         $invoice = Invoice::findOrFail($id);
 
         $invoice->update($attributes);
@@ -94,8 +104,12 @@ class InvoicingService
      * @param array $attributes
      * @return InvoiceLine
      */
-    public function createInvoiceLine(int $invoiceId, array $attributes): InvoiceLine
+    public function addInvoiceLine(int $invoiceId, array $attributes): InvoiceLine
     {
+        if (isset($attributes['amount']) && $attributes['amount'] < 0) {
+            throw new Exception('Invoice amount must be positive');
+        }
+
         $attributes['invoice_id'] = $invoiceId;
 
         $line = InvoiceLine::create($attributes);

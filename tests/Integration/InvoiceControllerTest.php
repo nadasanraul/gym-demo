@@ -74,16 +74,9 @@ class InvoiceControllerTest extends TestCase
             'description' => 'Test invoice',
         ]);
 
-        $content = json_decode($response->getContent(), true);
         $response->assertStatus(200);
         $response->assertJson([
             'description' => 'Test invoice',
-        ]);
-        $this->assertDatabaseHas('invoices', [
-            'user_id' => $this->user->id,
-            'description' => $content['description'],
-            'amount' => $content['amount'],
-            'id' => $content['id']
         ]);
     }
 
@@ -98,11 +91,6 @@ class InvoiceControllerTest extends TestCase
         ]);
 
         $response->assertStatus(400);
-        $this->assertDatabaseMissing('invoices', [
-            'user_id' => $this->user->id,
-            'description' => 'Test invoice',
-            'amount' => 1000,
-        ]);
     }
 
     public function testInvoiceCanBeUpdated()
@@ -111,16 +99,11 @@ class InvoiceControllerTest extends TestCase
             'description' => 'Updated description',
         ]);
 
-        $content = json_decode($response->getContent(), true);
         $response->assertStatus(200);
 
         $response->assertJson([
             'id' => $this->invoice->id,
             'description' => 'Updated description',
-        ]);
-        $this->assertDatabaseHas('invoices', [
-            'id' => $this->invoice->id,
-            'description' => $content['description'],
         ]);
     }
 
@@ -135,11 +118,6 @@ class InvoiceControllerTest extends TestCase
         ]);
 
         $response->assertStatus(400);
-        $this->assertDatabaseHas('invoices', [
-            'id' => $this->invoice->id,
-            'amount' => $this->invoice->amount,
-            'date' => $this->invoice->date,
-        ]);
     }
 
     public function testInvoiceCanBeDeleted()
@@ -148,9 +126,6 @@ class InvoiceControllerTest extends TestCase
         $response = $this->delete("api/invoices/{$invoice->id}");
 
         $response->assertStatus(204);
-        $this->assertDatabaseMissing('invoices', [
-            'id' => $invoice->id,
-        ]);
     }
 
     public function testInvoicesWithLinesCannotBeDeleted()
@@ -159,9 +134,5 @@ class InvoiceControllerTest extends TestCase
 
         $response = $this->delete("api/invoices/{$this->invoice->id}");
         $response->assertStatus(400);
-
-        $this->assertDatabaseHas('invoices', [
-            'id' => $this->invoice->id,
-        ]);
     }
 }

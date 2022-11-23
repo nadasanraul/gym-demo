@@ -26,20 +26,10 @@ class InvoiceLineControllerTest extends TestCase
             'description' => 'Test description',
         ]);
 
-        $content = json_decode($response->getContent(), true);
         $response->assertStatus(200);
         $response->assertJson([
             'amount' => 1000,
             'description' => 'Test description',
-        ]);
-        $this->assertDatabaseHas('invoice_lines', [
-            'id' => $content['id'],
-            'amount' => 1000,
-            'description' => 'Test description',
-        ]);
-        $this->assertDatabaseHas('invoices', [
-            'id' => $this->invoice->id,
-            'amount' => $this->invoice->amount + 1000,
         ]);
     }
 
@@ -51,12 +41,5 @@ class InvoiceLineControllerTest extends TestCase
         ]);
 
         $response->assertStatus(400);
-        $this->assertDatabaseMissing('invoice_lines', [
-            'amount' => -1000,
-        ]);
-        $this->assertDatabaseHas('invoices', [
-            'id' => $this->invoice->id,
-            'amount' => $this->invoice->amount,
-        ]);
     }
 }

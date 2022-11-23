@@ -13,7 +13,14 @@ class UserService
     {
     }
 
-    public function checkinUser(int $id)
+    /**
+     * Checking the user in and updating the invoice
+     *
+     * @param int $id
+     * @return void
+     * @throws Exception
+     */
+    public function checkinUser(int $id): void
     {
         /** @var User $user */
         $user = User::findOrFail($id);
@@ -26,15 +33,15 @@ class UserService
         }
 
         if (!$membership->isActive()) {
-            throw new Exception('Cannot check in with a non-active membership');
+            throw new Exception('Cannot check in with a cancelled membership!');
         }
 
         if ($membership->isNotStarted()) {
-            throw new Exception('Your current membership is expired');
+            throw new Exception('Your membership is not started yet!');
         }
 
         if ($membership->isExpired()) {
-            throw new Exception('Your current membership is expired');
+            throw new Exception('Your current membership is expired!');
         }
 
         if ($membership->isEmpty()) {
@@ -51,6 +58,6 @@ class UserService
             'amount' => 1000,
             'description' => 'Invoice line for the checkin on the date of ' . now()->format('d-m-Y'),
         ];
-        $this->invoicingService->createInvoiceLine($invoice->id, $invoiceLineAttributes);
+        $this->invoicingService->addInvoiceLine($invoice->id, $invoiceLineAttributes);
     }
 }

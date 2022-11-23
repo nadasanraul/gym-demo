@@ -20,7 +20,7 @@ class InvoiceLineController extends Controller
 
             $validated = $validator->validated();
 
-            $line = $invoicingService->createInvoiceLine($invoiceId, $validated);
+            $line = $invoicingService->addInvoiceLine($invoiceId, $validated);
 
             return response()->json($line);
         } catch (Throwable $e) {

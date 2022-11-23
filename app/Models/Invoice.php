@@ -30,6 +30,7 @@ class Invoice extends Model
         'description',
         'amount',
         'user_id',
+        'date',
     ];
 
     /**
