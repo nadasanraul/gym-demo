@@ -218,3 +218,12 @@ Checks in the user into a fitness club if they have a valid membership. An invoi
 
 ### Response
 Code: `204`
+
+## Improvements I would add
+* Adding caching for the user and invoices.
+* Map the request body to DTO objects before they're injected into the controller methods.
+* Paginate the response for the endpoint that gets all the invoices.
+* Implement [API resources](https://laravel.com/docs/9.x/eloquent-resources) to serve as response objects instead of returning the serialised eloquent models.
+* Dispatching a queue job to add the invoice line when the user checks in instead of doing it on the main thread.
+* Create a `CrudServiceInterface`, and `CrudInvoiceService` that would extend said interface and would encapsulate the logic to perform CRUD operations on the invoices.
+
