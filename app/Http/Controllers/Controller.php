@@ -11,6 +11,14 @@ class Controller extends BaseController
 {
     use ValidatesRequests;
 
+    /**
+     * Error JSON response for HTTP requests
+     *
+     * @param int $statusCode
+     * @param Throwable $throwable
+     * @param bool $debug
+     * @return JsonResponse
+     */
     protected function errorResponse(int $statusCode, Throwable $throwable, bool $debug = false): JsonResponse
     {
         $data = [
@@ -22,7 +30,6 @@ class Controller extends BaseController
                 'message' => $throwable->getMessage(),
                 'file' => $throwable->getFile(),
                 'line' => $throwable->getLine(),
-                'trace' => $throwable->getTrace(),
             ];
         }
 

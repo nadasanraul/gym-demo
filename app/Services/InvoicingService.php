@@ -7,6 +7,7 @@ use App\Models\Invoice;
 use App\Models\InvoiceLine;
 use App\Models\User;
 use Exception;
+use Illuminate\Database\Eloquent\Model;
 use Illuminate\Support\Collection;
 
 class InvoicingService
@@ -24,7 +25,7 @@ class InvoicingService
     }
 
     /**
-     * Retrieving a sing invoice from the database
+     * Retrieving a single invoice from the database
      *
      * @param int $id
      */
@@ -115,13 +116,19 @@ class InvoicingService
         $attributes['invoice_id'] = $invoiceId;
 
         $line = InvoiceLine::create($attributes);
-        // The incrementAmount call, is mapped to the scopeIncrementAmount in the Invoice model
-        Invoice::where('id', $invoiceId)->incrementAmount($line->amount);
+        Invoice::where('id', $invoiceId)->increment('amount', $line->amount);
 
         return $line;
     }
 
-    public function getCurrentInvoiceForUser(User $user)
+    /**
+     * Getting the invoice for the current month for a user.
+     * If no invoice exists, it gets created
+     *
+     * @param User $user
+     * @return Model
+     */
+    public function getCurrentInvoiceForUser(User $user): Model
     {
         return $user->invoices()
             ->whereYear('date', now()->year)

@@ -20,6 +20,11 @@ class InvoiceLine extends Model
         'invoice_id',
     ];
 
+    /**
+     * Defines the relation with invoice
+     *
+     * @return BelongsTo
+     */
     public function invoice(): BelongsTo
     {
         return $this->belongsTo(Invoice::class);

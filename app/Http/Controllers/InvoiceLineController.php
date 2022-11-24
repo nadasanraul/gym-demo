@@ -10,6 +10,14 @@ use Throwable;
 
 class InvoiceLineController extends Controller
 {
+    /**
+     * Endpoint to store an invoice line
+     *
+     * @param int $invoiceId
+     * @param Request $request
+     * @param InvoicingService $invoicingService
+     * @return JsonResponse
+     */
     public function store(int $invoiceId, Request $request, InvoicingService $invoicingService): JsonResponse
     {
         try {

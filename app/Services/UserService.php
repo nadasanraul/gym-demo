@@ -14,7 +14,7 @@ class UserService
     }
 
     /**
-     * Checking the user in and updating the invoice
+     * Checking in a user in and updating the invoice
      *
      * @param int $id
      * @return void

@@ -6,6 +6,9 @@ use App\Models\Enums\MembershipStatus;
 use App\Models\User;
 use Illuminate\Database\Eloquent\Factories\Factory;
 
+/**
+ * @extends \Illuminate\Database\Eloquent\Factories\Factory<\App\Models\Membership>
+ */
 class MembershipFactory extends Factory
 {
     /**
