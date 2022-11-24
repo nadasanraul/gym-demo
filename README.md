@@ -15,7 +15,7 @@ This application is a system of RESTful API endpoints to perform CRUD operations
 
 
 ## Running the tests
-Once the application is running, you can run the test suite by running `docker-compose exec app ./vendor/bin/phpunit`.
+Once the application is running, you can run the test suite by running <br/> `docker-compose exec app ./vendor/bin/phpunit`.
 
 ## Endpoints
 
