@@ -1,5 +1,22 @@
 This application is a system of RESTful API endpoints to perform CRUD operations on an invoice and to allow a user to check in into a fitness club.
 
+## Running the application
+1. Clone the repository in your local system: `git clone git@github.com:recruitmentvg/nadasanraul.git`.
+2. Navigate to the directory where the repository was cloned: `cd nadasanraul`.
+3. Create the `.env` file: `cp .env.example .env`.
+4. Open the `.env` file in your favorite code editor and populate the `DB_DATABASE`, `DB_USERNAME` and `DB_PASSWORD` with your chosen values.
+5. Build the app image: `docker-compose build app`.
+6. Instantiate the docker container: `docker-compose up -d`.
+7. Install the composer packages: `docker-compose exec app composer install`.
+8. Generate the application key: `docker-compose exec app php artisan key:generate`.
+9. Migrate the database: `docker-compose exec app php artisan migrate`.
+10. (Optional) If you want to have dummy data, run `docker-compose exec app php artisan db:seed`.
+11. Now you can access the application at `http://localhost:8000`.
+
+
+## Running the tests
+Once the application is running, you can run the test suite by running `docker-compose exec app ./vendor/bin/phpunit`.
+
 ## Endpoints
 
 ### GET `/api/invoices`
