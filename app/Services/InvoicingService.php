@@ -51,6 +51,8 @@ class InvoicingService
             $attributes['status'] = InvoiceStatus::Outstanding;
         }
 
+        $attributes['date'] = now();
+
         $invoice = Invoice::create($attributes);
         $invoice->refresh();
 
