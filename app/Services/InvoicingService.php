@@ -56,6 +56,7 @@ class InvoicingService
 
         $invoice = Invoice::create($attributes);
         $invoice->refresh();
+        $invoice->load(['lines', 'user']);
 
         return $invoice;
     }
@@ -78,6 +79,7 @@ class InvoicingService
 
         $invoice->update($attributes);
         $invoice->refresh();
+        $invoice->load(['lines', 'user']);
 
         return $invoice;
     }

@@ -44,9 +44,7 @@ class InvoiceController extends Controller
         try {
             $invoice = $this->invoicingService->getInvoice($id);
 
-            return response()->json([
-                $invoice,
-            ]);
+            return response()->json($invoice);
         } catch (Throwable $e) {
             return $this->errorResponse(statusCode: 400, throwable: $e);
         }

@@ -1,14 +1,203 @@
 This application is a system of RESTful API endpoints to perform CRUD operations on an invoice and to allow a user to check in into a fitness club.
 
-### Endpoints
+## Endpoints
 
-#### Invoices
-* `GET     /api/invoices - Returns all the invoices`
-* `POST    /api/invoices - Creates a new invoice`
-* `GET    /api/invoices/{id} - Returns a single invoice`
-* `PATCH  /api/invoices/{id} - Updates an invoice`
-* `DELETE /api/invoices/{id} - Deletes an invoice`
-* `POST   /api/invoices/{id}/lines - Addes an invoice line to an invoice`
+### GET `/api/invoices`
+This endpoint handles fetching all the invoices, together with the lines for each invoice and the user it belongs to.
 
-#### Users
-* `POST /api/users/checkin - Checks in a user in a fitnes club`
+#### Response
+Code: `200`
+```json
+[
+    {
+        "id": 1,
+        "status": "Outstanding",
+        "description": "Cum molestiae sequi in laboriosam nisi aut earum.",
+        "amount": 10000,
+        "date": "2022-11-24 20:57:21",
+        "lines": [
+            {
+                "id": 1,
+                "invoice_id": 2,
+                "amount": 5000,
+                "description": "Animi necessitatibus sed ullam cupiditate ipsa deserunt sunt."
+            },
+            {
+                "id": 2,
+                "invoice_id": 2,
+                "amount": 5000,
+                "description": "Et excepturi earum illo."
+            }
+        ],
+        "user": {
+            "id": 1,
+            "name": "Ms. Virgie Hartmann",
+            "email": "emmett30@example.net"
+        }
+    }
+]
+```
+<br/>
+
+### POST `/api/invoices`
+Handles the creation of a new invoice. It is created without any lines, with an amount of 0 and with the status as `Outstanding`
+
+#### Body
+| Name           | Required | Type    | Description                                                                         |
+|----------------|----------|---------|-------------------------------------------------------------------------------------|
+| `user_id`      | required | integer | The ID of the user the invoice will belong to                                       |
+| `description`  | required | string  | A short phrase to explain what the invoice is about<br/> Max length: 255 characters |
+
+#### Response
+Code: `200`
+```json
+{
+    "id": 13,
+    "status": "Outstanding",
+    "description": "This is the invoice for 11-2022",
+    "amount": 0,
+    "date": "2022-11-24 21:17:12",
+    "lines": [],
+    "user": {
+        "id": 6,
+        "name": "Ms. Virgie Hartmann",
+        "email": "emmett30@example.net"
+    }
+}
+```
+<br/>
+
+### GET `/api/invoices/{id}`
+Fetches a single invoice based on its id, together with the associated invoice lines and the user
+
+#### Parameters
+| Name  | Required | Type    | Description                         |
+|-------|----------|---------|-------------------------------------|
+| `id`  | required | integer | The id of the invoice to be fetched |
+
+#### Response
+Code: `200`
+```json
+{
+    "id": 2,
+    "status": "Outstanding",
+    "description": "Cum molestiae sequi in laboriosam nisi aut earum.",
+    "amount": 10000,
+    "date": "2022-11-24 20:57:21",
+    "lines": [
+        {
+            "id": 12,
+            "invoice_id": 2,
+            "amount": 5000,
+            "description": "Animi necessitatibus sed ullam cupiditate ipsa deserunt sunt."
+        },
+        {
+            "id": 13,
+            "invoice_id": 2,
+            "amount": 5000,
+            "description": "Et excepturi earum illo."
+        }
+    ],
+    "user": {
+        "id": 2,
+        "name": "Dr. Hollie Pacocha",
+        "email": "verla.oreilly@example.com"
+    }
+}
+```
+<br/>
+
+### PATCH `/api/invoices/{id}`
+Updating a single invoice based on the id. The response returns the updated invoice with the invoice lines and user.
+
+#### Parameters
+| Name  | Required | Type    | Description                         |
+|-------|----------|---------|-------------------------------------|
+| `id`  | required | integer | The id of the invoice to be updated |
+
+#### Body
+| Name         | Required | Type   | Description                                                                                        |
+|--------------|----------|--------|----------------------------------------------------------------------------------------------------|
+| `description` | optional | string | A short phrase to explain what the invoice is about<br/> Max length: 255 characters                |
+| `status`      | optional | string | The new status to be set on the invoice<br/>Eligible values are: `Outstanding`, `Paid` and `Void`  |
+
+#### Response
+Code: `200`
+```json
+{
+    "id": 2,
+    "status": "Void",
+    "description": "Updated description",
+    "amount": 10000,
+    "date": "2022-11-24 22:34:10",
+    "lines": [
+        {
+            "id": 12,
+            "invoice_id": 2,
+            "amount": 5000,
+            "description": "Animi necessitatibus sed ullam cupiditate ipsa deserunt sunt."
+        },
+        {
+            "id": 13,
+            "invoice_id": 2,
+            "amount": 5000,
+            "description": "Et excepturi earum illo."
+        }
+    ],
+    "user": {
+        "id": 2,
+        "name": "Dr. Hollie Pacocha",
+        "email": "verla.oreilly@example.com"
+    }
+}
+```
+<br/>
+
+### DELETE `/api/invoices/{id}`
+Deleting a single invoice. Deleting is only allowed if the invoice has no lines associated with it.
+
+#### Parameters
+| Name  | Required | Type    | Description                         |
+|-------|----------|---------|-------------------------------------|
+| `id`  | required | integer | The id of the invoice to be deleted |
+
+#### Response
+Code: `204`
+<br/>
+<br/>
+### POST `/api/invoices/{id}/lines`
+Adds an invoice lines to an invoice. The amount of the invoice will be incremented by the amount of the line. Returns the line being added.
+
+#### Parameters
+| Name  | Required | Type    | Description                                     |
+|-------|----------|---------|-------------------------------------------------|
+| `id`  | required | integer | The id of the invoice the line will be added to |
+
+#### Body
+| Name           | Required | Type    | Description                                                                           |
+|----------------|----------|---------|---------------------------------------------------------------------------------------|
+| `amount`       | required | integer | The amount associated with the line. Must be positive.                                |
+| `description`  | required | string  | Short phrase to explain what the invoice line is about<br/>Max length: 255 characters |
+
+#### Response
+Code: `200`
+```json
+{
+    "amount": 1000,
+    "description": "Check in on 24-11-2022",
+    "invoice_id": 12,
+    "id": 112
+}
+```
+<br/>
+
+### POST `/api/users/{id}/checkin`
+Checks in the user into a fitness club if they have a valid membership. An invoice line is added every time the user successfully checks in, and 1 credit is subtracted from their membership.
+
+#### Parameters
+| Name  | Required | Type    | Description                    |
+|-------|----------|---------|--------------------------------|
+| `id`  | required | integer | The id of the user checking in |
+
+### Response
+Code: `204`
