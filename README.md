@@ -226,4 +226,5 @@ Code: `204`
 * Implement [API resources](https://laravel.com/docs/9.x/eloquent-resources) to serve as response objects instead of returning the serialised eloquent models.
 * Dispatching a queue job to add the invoice line when the user checks in instead of doing it on the main thread.
 * Create a `CrudServiceInterface`, and `CrudInvoiceService` that would implement said interface and would encapsulate the logic to perform CRUD operations on the invoices.
+* Improve error handling by adding more catch blocks for specific exception types. 
 
