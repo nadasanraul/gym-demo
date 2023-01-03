@@ -7,17 +7,17 @@ services:
                 uid: 502
             context: ./
             dockerfile: Dockerfile
-        image: virtuagym
-        container_name: virtuagym-app
+        image: gymdemo
+        container_name: gymdemo-app
         restart: unless-stopped
         working_dir: /var/www/
         volumes:
             - ./:/var/www
         networks:
-            - virtuagym
+            - gymdemo
     db:
         image: mysql:8.0
-        container_name: virtuagym-db
+        container_name: gymdemo-db
         restart: unless-stopped
         environment:
             MYSQL_DATABASE: ${DB_DATABASE}
@@ -26,10 +26,10 @@ services:
             SERVICE_TAGS: dev
             SERVICE_NAME: mysql
         networks:
-            - virtuagym
+            - gymdemo
     nginx:
         image: nginx:1.17-alpine
-        container_name: virtuagym-nginx
+        container_name: gymdemo-nginx
         restart: unless-stopped
         ports:
             - 8000:80
@@ -37,7 +37,7 @@ services:
             - ./:/var/www
             - ./nginx.conf:/etc/nginx/conf.d/default.conf
         networks:
-            - virtuagym
+            - gymdemo
 networks:
-    virtuagym:
+    gymdemo:
         driver: bridge
